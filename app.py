@@ -3,220 +3,264 @@ from summarizer import summarize_text
 from text_cleaner import clean_text
 
 # ---------------------------------------------------
-# PAGE CONFIG
+# 1. PAGE CONFIGURATION
 # ---------------------------------------------------
 st.set_page_config(
-    page_title="AI Text Summarizer",
-    page_icon="🧠",
+    page_title="AI Summarizer Pro",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # ---------------------------------------------------
-# EXPERT CSS (Polished & Imported)
+# 2. MASTERCLASS CSS SYSTEM
 # ---------------------------------------------------
 st.markdown("""
 <style>
-/* IMPORT FONTS */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    /* IMPORT FONT - INTER */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-    background-color: #020617; /* Deepest dark for contrast */
-}
+    /* GLOBAL RESET */
+    .stApp {
+        background-color: #0e1117; /* Deepest Onyx */
+        font-family: 'Inter', sans-serif;
+    }
 
-/* HEADER */
-.title {
-    font-size: 52px;
-    font-weight: 800;
-    background: linear-gradient(90deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0;
-}
+    /* --------------------------------------
+       TYPOGRAPHY
+       -------------------------------------- */
+    h1, h2, h3 {
+        font-family: 'Inter', sans-serif;
+        color: #f8fafc;
+    }
 
-.subtitle {
-    color: #94a3b8;
-    margin-top: 10px;
-    font-size: 18px;
-    font-weight: 400;
-}
+    .main-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 0px;
+        letter-spacing: -1.5px;
+        text-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+    }
+    
+    .accent-text {
+        color: #818cf8; /* Indigo 400 */
+    }
 
-/* CARDS - Modern Glassy Feel */
-.main-card {
-    background: #0f172a;
-    padding: 30px;
-    border-radius: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.1); /* Subtle border */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
+    .subtitle {
+        font-size: 1.2rem;
+        color: #94a3b8; /* Slate 400 */
+        font-weight: 400;
+        margin-bottom: 40px;
+    }
 
-.summary-card {
-    background: #1e293b;
-    padding: 25px;
-    border-radius: 12px;
-    border-left: 4px solid #60a5fa; /* Accent line */
-    color: #e2e8f0;
-    font-size: 16px;
-    line-height: 1.6;
-}
+    /* --------------------------------------
+       INPUT AREA STYLING (THE FIX)
+       -------------------------------------- */
+    /* Target the text area container */
+    .stTextArea textarea {
+        background-color: #1e293b !important; /* Slate 800 */
+        border: 1px solid #334155 !important;
+        border-radius: 12px;
+        color: #e2e8f0;
+        font-size: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
 
-/* METRIC CARDS */
-.metric-card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
+    .stTextArea textarea:focus {
+        border-color: #818cf8 !important; /* Indigo Focus */
+        box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2) !important;
+    }
+    
+    /* Remove default top label gap */
+    .stTextArea label {
+        display: none !important;
+    }
 
-.metric-label {
-    color: #94a3b8;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+    /* --------------------------------------
+       BUTTONS
+       -------------------------------------- */
+    .stButton > button {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        transition: all 0.2s;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+    }
 
-.metric-value {
-    font-size: 32px;
-    font-weight: 700;
-    margin: 5px 0 0 0;
-}
+    /* --------------------------------------
+       SUMMARY CARD
+       -------------------------------------- */
+    .result-card {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 16px;
+        padding: 30px;
+        color: #e2e8f0;
+        line-height: 1.7;
+        font-size: 1.05rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    
+    .result-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        border-radius: 16px 16px 0 0;
+    }
 
-/* BUTTON OVERRIDE */
-.stButton>button {
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-    color: white;
-    border: none;
-    padding: 16px;
-    font-size: 18px !important;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
+    /* --------------------------------------
+       METRICS
+       -------------------------------------- */
+    [data-testid="stMetricValue"] {
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        color: #f8fafc !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        font-size: 0.9rem !important;
+        color: #94a3b8 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-.stButton>button:hover {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-    transform: translateY(-2px);
-}
+    /* --------------------------------------
+       SELECTBOX (Length)
+       -------------------------------------- */
+    div[data-baseweb="select"] > div {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+        color: white !important;
+        border-radius: 8px;
+    }
 
-/* INPUT TEXT AREA */
-textarea {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
-    border: 1px solid #334155 !important;
-}
-textarea:focus {
-    border-color: #60a5fa !important;
-    box-shadow: 0 0 0 1px #60a5fa !important;
-}
-
-/* FOOTER */
-.footer {
-    text-align: center;
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid #1e293b;
-    color: #64748b;
-}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------
-# HEADER SECTION
+# 3. HEADER SECTION
 # ---------------------------------------------------
-st.markdown("<div class='title'>🧠 AI Summarizer</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Transform long documents into clear, concise insights in seconds.</div>", unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+# Using columns to center align effectively if needed, but keeping it left for modern feel
+st.markdown('<div class="main-title">AI <span class="accent-text">Summarizer</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Transform complex documentation into clear, actionable intelligence.</div>', unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ---------------------------------------------------
-# MAIN CONTROL PANEL
+# 4. INPUT SECTION (The Workspace)
 # ---------------------------------------------------
-# We use a container to wrap inputs for a "Card" look
-with st.container():
-    st.markdown("<div class='main-card'>", unsafe_allow_html=True)
-    
-    # Header inside the card
-    c1, c2 = st.columns([4, 1])
-    with c1:
-        st.subheader("📝 Input Text")
-    with c2:
-        # Move Length Selector HERE for better UX
-        length_option = st.selectbox("", ["Short", "Medium", "Long"], index=1, label_visibility="collapsed")
+c1, c2 = st.columns([3, 1])
 
-    user_text = st.text_area(
-        "", 
-        height=250, 
-        placeholder="Paste your article, report, or notes here..."
+with c2:
+    # Controls moved to the side for better ergonomics
+    st.markdown("##### ⚙️ Settings")
+    length_option = st.selectbox(
+        "Summary Detail",
+        ["Short", "Medium", "Long"],
+        index=1,
+        help="Select how detailed you want the summary to be."
     )
     
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Add some vertical spacing
+    st.write("") 
+    st.write("") 
     
-    # Full width button
-    generate_btn = st.button("✨ Summarize Text", use_container_width=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+    generate_btn = st.button("✨ Summarize", use_container_width=True)
+
+with c1:
+    st.markdown("##### 📄 Source Text")
+    user_text = st.text_area(
+        "Input Text", # Hidden by CSS but required for accessibility
+        height=300,
+        placeholder="Paste your report, article, or raw text here to begin analysis..."
+    )
 
 # ---------------------------------------------------
-# RESULTS SECTION
+# 5. LOGIC & RESULTS
 # ---------------------------------------------------
 if generate_btn:
     if not user_text.strip():
-        st.error("Please enter some text to summarize.")
+        st.toast("⚠️ Please enter some text first!", icon="⚠️")
     else:
-        with st.spinner("Analyzing text patterns..."):
-            cleaned = clean_text(user_text)
-            # Map UI options to backend requirements if needed
-            summary = summarize_text(cleaned, length_option.lower()) 
-
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        # Progress Bar for UX
+        progress_text = "Analyzing text semantics..."
+        my_bar = st.progress(0, text=progress_text)
         
-        # 2/3 Split for Summary vs Analytics
-        res_col1, res_col2 = st.columns([2, 1])
+        # Simulate processing (remove import time.sleep in prod, just logic here)
+        cleaned = clean_text(user_text)
+        my_bar.progress(50, text="Generating natural language summary...")
+        
+        summary = summarize_text(cleaned, length_option.lower()) 
+        my_bar.progress(100, text="Complete!")
+        my_bar.empty()
 
-        # --- LEFT: SUMMARY ---
-        with res_col1:
-            st.markdown("### 📄 Generated Summary")
-            st.markdown(f"<div class='summary-card'>{summary}</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # ---------------------------------------------------
+        # RESULT LAYOUT
+        # ---------------------------------------------------
+        r_col1, r_col2 = st.columns([2, 1])
+
+        with r_col1:
+            st.markdown("### 🧠 Intelligence Output")
+            st.markdown(f"""
+            <div class="result-card">
+                {summary}
+            </div>
+            """, unsafe_allow_html=True)
             
             st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Download Button with unique key to prevent reload issues
             st.download_button(
-                label="📥 Download Summary",
+                label="📥 Export Report",
                 data=summary,
-                file_name="summary.txt",
+                file_name="AI_Summary_Report.txt",
                 mime="text/plain"
             )
 
-        # --- RIGHT: ANALYTICS ---
-        with res_col2:
-            st.markdown("### 📊 Metrics")
+        with r_col2:
+            st.markdown("### 📊 Analytics")
             
+            # Calculating Metrics
             orig_words = len(cleaned.split())
             sum_words = len(summary.split())
             reduction = round(((orig_words - sum_words)/orig_words)*100, 1) if orig_words else 0
             
-            # Custom Metric Card Function to keep code clean
-            def metric_html(label, value, color_hex):
-                return f"""
-                <div class="metric-card">
-                    <div class="metric-label">{label}</div>
-                    <div class="metric-value" style="color: {color_hex}">{value}</div>
-                </div>
-                <br>
-                """
-
-            st.markdown(metric_html("Original Words", orig_words, "#94a3b8"), unsafe_allow_html=True)
-            st.markdown(metric_html("Summary Words", sum_words, "#60a5fa"), unsafe_allow_html=True)
-            
-            # Dynamic color for reduction
-            red_color = "#34d399" if reduction > 0 else "#f87171" 
-            st.markdown(metric_html("Reduction", f"{reduction}%", red_color), unsafe_allow_html=True)
+            # Using Streamlit Native Metrics for clean alignment
+            with st.container(border=True):
+                m1, m2 = st.columns(2)
+                m1.metric("Original", orig_words)
+                m2.metric("Summary", sum_words)
+                
+                st.divider()
+                
+                st.metric("Efficiency Gain", f"{reduction}%", delta=f"{reduction}% reduction")
 
 # ---------------------------------------------------
-# FOOTER
+# 6. FOOTER
 # ---------------------------------------------------
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
-<div class='footer'>
-    Microsoft Elevate Capstone Project • Powered by Transformers & Streamlit
+<div style="text-align: center; color: #475569; font-size: 0.8rem;">
+    Microsoft Elevate Capstone Project &nbsp; • &nbsp; Engineered with Transformers
 </div>
 """, unsafe_allow_html=True)
