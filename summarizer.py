@@ -1,10 +1,11 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import re
 
-MODEL_PATH = "models/t5-small"
+MODEL_NAME = "t5-small"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_PATH, local_files_only=True)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
+
 
 
 # ---------- HEAVY OCR CLEANING ----------
