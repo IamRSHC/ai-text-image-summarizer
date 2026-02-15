@@ -6,14 +6,14 @@ from text_cleaner import clean_text
 # 1. PAGE CONFIGURATION
 # ---------------------------------------------------
 st.set_page_config(
-    page_title="AI Summarizer Pro",
-    page_icon="⚡",
+    page_title="AI Summarizer | Light",
+    page_icon="✨",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # ---------------------------------------------------
-# 2. MASTERCLASS CSS SYSTEM
+# 2. MASTERCLASS CSS (LIGHT MODE)
 # ---------------------------------------------------
 st.markdown("""
 <style>
@@ -22,7 +22,7 @@ st.markdown("""
 
     /* GLOBAL RESET */
     .stApp {
-        background-color: #0e1117; /* Deepest Onyx */
+        background-color: #f8fafc; /* Very light slate background */
         font-family: 'Inter', sans-serif;
     }
 
@@ -31,50 +31,58 @@ st.markdown("""
        -------------------------------------- */
     h1, h2, h3 {
         font-family: 'Inter', sans-serif;
-        color: #f8fafc;
+        color: #0f172a !important; /* Slate 900 */
     }
 
     .main-title {
         font-size: 3.5rem;
         font-weight: 800;
-        color: #ffffff;
+        color: #0f172a;
         margin-bottom: 0px;
         letter-spacing: -1.5px;
-        text-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
     }
     
     .accent-text {
-        color: #818cf8; /* Indigo 400 */
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .subtitle {
         font-size: 1.2rem;
-        color: #94a3b8; /* Slate 400 */
+        color: #64748b; /* Slate 500 */
         font-weight: 400;
         margin-bottom: 40px;
     }
+    
+    .section-header {
+        color: #334155;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
 
     /* --------------------------------------
-       INPUT AREA STYLING (THE FIX)
+       INPUT AREA STYLING (Clean White)
        -------------------------------------- */
     /* Target the text area container */
     .stTextArea textarea {
-        background-color: #1e293b !important; /* Slate 800 */
-        border: 1px solid #334155 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important; /* Light border */
         border-radius: 12px;
-        color: #e2e8f0;
+        color: #1e293b; /* Dark text */
         font-size: 16px;
         padding: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Soft shadow */
         transition: all 0.2s ease;
     }
 
     .stTextArea textarea:focus {
-        border-color: #818cf8 !important; /* Indigo Focus */
-        box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2) !important;
+        border-color: #6366f1 !important; /* Indigo Focus */
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important; /* Soft glow ring */
     }
     
-    /* Remove default top label gap */
+    /* Remove default label space */
     .stTextArea label {
         display: none !important;
     }
@@ -83,13 +91,13 @@ st.markdown("""
        BUTTONS
        -------------------------------------- */
     .stButton > button {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* Indigo to Purple */
         color: white;
         font-weight: 600;
         padding: 0.75rem 1.5rem;
         border-radius: 10px;
         border: none;
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
         transition: all 0.2s;
         width: 100%;
         font-size: 1.1rem;
@@ -97,21 +105,25 @@ st.markdown("""
     
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0px);
     }
 
     /* --------------------------------------
-       SUMMARY CARD
+       RESULT CARD
        -------------------------------------- */
     .result-card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 16px;
         padding: 30px;
-        color: #e2e8f0;
+        color: #334155; /* Slate 700 */
         line-height: 1.7;
         font-size: 1.05rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); /* Elevated look */
         position: relative;
     }
     
@@ -121,35 +133,46 @@ st.markdown("""
         top: 0;
         left: 0;
         width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        height: 6px;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
         border-radius: 16px 16px 0 0;
     }
 
     /* --------------------------------------
-       METRICS
+       METRICS (FORCE DARK TEXT)
        -------------------------------------- */
     [data-testid="stMetricValue"] {
-        font-size: 2.5rem !important;
+        font-size: 2.2rem !important;
         font-weight: 700 !important;
-        color: #f8fafc !important;
+        color: #0f172a !important; /* Slate 900 */
     }
     
     [data-testid="stMetricLabel"] {
-        font-size: 0.9rem !important;
-        color: #94a3b8 !important;
+        font-size: 0.85rem !important;
+        color: #64748b !important; /* Slate 500 */
+        font-weight: 600 !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
 
     /* --------------------------------------
-       SELECTBOX (Length)
+       SELECTBOX & UI ELEMENTS
        -------------------------------------- */
     div[data-baseweb="select"] > div {
-        background-color: #1e293b !important;
-        border-color: #334155 !important;
-        color: white !important;
-        border-radius: 8px;
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Metric container background */
+    div[data-testid="stMetric"] {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
     }
 
 </style>
@@ -158,11 +181,10 @@ st.markdown("""
 # ---------------------------------------------------
 # 3. HEADER SECTION
 # ---------------------------------------------------
-# Using columns to center align effectively if needed, but keeping it left for modern feel
 st.markdown('<div class="main-title">AI <span class="accent-text">Summarizer</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Transform complex documentation into clear, actionable intelligence.</div>', unsafe_allow_html=True)
 
-st.markdown("---")
+st.divider()
 
 # ---------------------------------------------------
 # 4. INPUT SECTION (The Workspace)
@@ -170,8 +192,9 @@ st.markdown("---")
 c1, c2 = st.columns([3, 1])
 
 with c2:
-    # Controls moved to the side for better ergonomics
-    st.markdown("##### ⚙️ Settings")
+    # CONTROLS
+    st.markdown('<div class="section-header">⚙️ Settings</div>', unsafe_allow_html=True)
+    
     length_option = st.selectbox(
         "Summary Detail",
         ["Short", "Medium", "Long"],
@@ -179,17 +202,17 @@ with c2:
         help="Select how detailed you want the summary to be."
     )
     
-    # Add some vertical spacing
     st.write("") 
     st.write("") 
     
     generate_btn = st.button("✨ Summarize", use_container_width=True)
 
 with c1:
-    st.markdown("##### 📄 Source Text")
+    # INPUT
+    st.markdown('<div class="section-header">📄 Source Text</div>', unsafe_allow_html=True)
     user_text = st.text_area(
-        "Input Text", # Hidden by CSS but required for accessibility
-        height=300,
+        "Input Text",
+        height=320,
         placeholder="Paste your report, article, or raw text here to begin analysis..."
     )
 
@@ -198,13 +221,13 @@ with c1:
 # ---------------------------------------------------
 if generate_btn:
     if not user_text.strip():
-        st.toast("⚠️ Please enter some text first!", icon="⚠️")
+        st.warning("⚠️ Please enter some text to process.")
     else:
-        # Progress Bar for UX
+        # Progress Bar
         progress_text = "Analyzing text semantics..."
         my_bar = st.progress(0, text=progress_text)
         
-        # Simulate processing (remove import time.sleep in prod, just logic here)
+        # PROCESSING
         cleaned = clean_text(user_text)
         my_bar.progress(50, text="Generating natural language summary...")
         
@@ -220,7 +243,7 @@ if generate_btn:
         r_col1, r_col2 = st.columns([2, 1])
 
         with r_col1:
-            st.markdown("### 🧠 Intelligence Output")
+            st.markdown('<div class="section-header">🧠 Intelligence Output</div>', unsafe_allow_html=True)
             st.markdown(f"""
             <div class="result-card">
                 {summary}
@@ -229,7 +252,6 @@ if generate_btn:
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Download Button with unique key to prevent reload issues
             st.download_button(
                 label="📥 Export Report",
                 data=summary,
@@ -238,29 +260,29 @@ if generate_btn:
             )
 
         with r_col2:
-            st.markdown("### 📊 Analytics")
+            st.markdown('<div class="section-header">📊 Analytics</div>', unsafe_allow_html=True)
             
-            # Calculating Metrics
+            # Metrics Logic
             orig_words = len(cleaned.split())
             sum_words = len(summary.split())
             reduction = round(((orig_words - sum_words)/orig_words)*100, 1) if orig_words else 0
             
-            # Using Streamlit Native Metrics for clean alignment
-            with st.container(border=True):
-                m1, m2 = st.columns(2)
-                m1.metric("Original", orig_words)
-                m2.metric("Summary", sum_words)
-                
-                st.divider()
-                
-                st.metric("Efficiency Gain", f"{reduction}%", delta=f"{reduction}% reduction")
+            # Metric Layout
+            m1, m2 = st.columns(2)
+            with m1:
+                st.metric("Original", orig_words)
+            with m2:
+                st.metric("Summary", sum_words)
+            
+            st.write("")
+            st.metric("Efficiency Gain", f"{reduction}%", delta=f"{reduction}% reduction")
 
 # ---------------------------------------------------
 # 6. FOOTER
 # ---------------------------------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
-<div style="text-align: center; color: #475569; font-size: 0.8rem;">
+<div style="text-align: center; color: #94a3b8; font-size: 0.8rem;">
     Microsoft Elevate Capstone Project &nbsp; • &nbsp; Engineered with Transformers
 </div>
 """, unsafe_allow_html=True)
