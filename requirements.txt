@@ -1,7 +1,6 @@
 streamlit
-transformers
+transformers==4.46.3
 torch
 sentencepiece
-pytesseract
-Pillow
-opencv-python-headless
+accelerate
+huggingface-hub

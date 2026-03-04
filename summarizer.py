@@ -1,84 +1,101 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import re
-
-MODEL_NAME = "t5-small"
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
+from transformers import pipeline
+from text_cleaner import clean_text, is_garbage_input
 
 
+class TextSummarizer:
 
-# ---------- HEAVY OCR CLEANING ----------
-def smart_clean(text):
-    text = text.replace("\n", " ")
+    def __init__(self):
 
-    # remove weird OCR symbols
-    text = re.sub(r"[^a-zA-Z0-9.,!?%()\-:; ]+", " ", text)
+        # Load models once
+        self.bart = pipeline(
+            "summarization",
+            model="facebook/bart-large-cnn"
+        )
 
-    # remove extra spaces
-    text = re.sub(r"\s+", " ", text)
+        self.t5 = pipeline(
+            "summarization",
+            model="t5-small"
+        )
 
-    # fix OCR mistakes
-    text = text.replace(" al ", " AI ")
-    text = text.replace(" Al ", " AI ")
-    text = text.replace(" are al", " are AI")
-    text = text.replace(" Self are", " Self aware")
+    def summarize(self, text, model="auto", detail="medium"):
 
-    return text.strip()
+        text = clean_text(text)
+
+        if is_garbage_input(text):
+            return "Input text is too short for meaningful summarization.", "None"
+
+        words = len(text.split())
+
+        # ----------------------------
+        # Dynamic Length Control
+        # ----------------------------
+
+        if detail == "short":
+            max_len = int(words * 0.35)
+            min_len = int(words * 0.15)
+
+        elif detail == "medium":
+            max_len = int(words * 0.55)
+            min_len = int(words * 0.25)
+
+        else:
+            max_len = int(words * 0.75)
+            min_len = int(words * 0.40)
+
+        max_len = max(20, min(max_len, 200))
+        min_len = max(10, min(min_len, max_len - 5))
+
+        # ----------------------------
+        # Model Selection
+        # ----------------------------
+
+        if model == "bart":
+            summarizer = self.bart
+            model_used = "🧠 BART (Accurate)"
+            text = "summarize: " + text
+
+        elif model == "t5":
+            summarizer = self.t5
+            model_used = "⚡ T5 (Fast)"
+            text = "summarize: " + text
+
+        else:
+            if words > 120:
+                summarizer = self.bart
+                model_used = "⚙️ Auto → BART"
+            else:
+                summarizer = self.t5
+                model_used = "⚙️ Auto → T5"
+
+            text = "summarize: " + text
+
+        summary = summarizer(
+            text,
+            max_length=max_len,
+            min_length=min_len,
+            do_sample=False,
+            repetition_penalty=1.3,
+            no_repeat_ngram_size=3,
+            early_stopping=True
+        )[0]["summary_text"]
+
+        summary = summary.strip()
+
+        if summary:
+            summary = summary[0].upper() + summary[1:]
+
+        return summary, model_used
 
 
-# ---------- CONVERT BULLETS → SENTENCES ----------
-def structure_ocr_text(text):
-    """
-    Converts broken OCR bullet text into readable paragraph
-    """
-    lines = text.split(". ")
+# -----------------------------------
+# GLOBAL INSTANCE
+# -----------------------------------
 
-    # If text has many short broken words → treat as bullet list
-    if len(text.split()) < 80 and "\n" in text:
-        words = text.replace("\n", " ").split()
-        return " ".join(words)
-
-    return text
+summarizer = TextSummarizer()
 
 
-# ---------- MAIN SUMMARIZER ----------
-def summarize_text(text, length="medium"):
+def summarize_text(text, detail="medium", model="auto"):
 
-    text = smart_clean(text)
-    text = structure_ocr_text(text)
+    summary, model_used = summarizer.summarize(text, model, detail)
 
-    if len(text.split()) < 25:
-        return "Text too short to summarize properly."
-
-    if length == "short":
-        max_len = 60
-        min_len = 20
-    elif length == "long":
-        max_len = 180
-        min_len = 80
-    else:
-        max_len = 120
-        min_len = 40
-
-    prompt = "Summarize clearly in simple sentences: " + text
-
-    inputs = tokenizer.encode(
-        prompt,
-        return_tensors="pt",
-        max_length=512,
-        truncation=True
-    )
-
-    summary_ids = model.generate(
-        inputs,
-        max_length=max_len,
-        min_length=min_len,
-        num_beams=6,
-        length_penalty=2.2,
-        no_repeat_ngram_size=3,
-        early_stopping=True
-    )
-
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-    return summary
+    return summary, model_used
